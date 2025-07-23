@@ -2,8 +2,8 @@
 memorix-ai==0.1.0
 
 # Vector Stores
-faiss-cpu==1.7.4
-qdrant-client==1.6.0
+faiss-cpu>=1.7.4,<2.0.0
+qdrant-client>=1.6.0
 
 # Embedding Models
 openai>=1.3.0
