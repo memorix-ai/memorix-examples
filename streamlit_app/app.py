@@ -395,13 +395,13 @@ def show_search_retrieve(memory):
                             for key, value in metadata_filter.items():
                                 if key == "tags":
                                     # Handle tags as a list
-                                    result_tags = result['metadata'].get('tags', [])
+                                    result_tags = result.get('metadata', {}).get('tags', [])
                                     if isinstance(result_tags, str):
                                         result_tags = [tag.strip() for tag in result_tags.split(",")]
                                     if not any(tag in result_tags for tag in value):
                                         matches = False
                                         break
-                                elif result['metadata'].get(key) != value:
+                                elif result.get('metadata', {}).get(key) != value:
                                     matches = False
                                     break
                             if matches:
@@ -420,7 +420,7 @@ def show_search_retrieve(memory):
                             st.write(result['content'])
                             
                             st.write("**Metadata:**")
-                            st.json(result['metadata'])
+                            st.json(result.get('metadata', {}))
                             
                             # Action buttons
                             col1, col2 = st.columns(2)
@@ -428,7 +428,7 @@ def show_search_retrieve(memory):
                                 if st.button(f"Update {i}", key=f"update_{i}"):
                                     st.session_state.editing_result = i
                                     st.session_state.editing_content = result['content']
-                                    st.session_state.editing_metadata = result['metadata']
+                                    st.session_state.editing_metadata = result.get('metadata', {})
                             
                             with col2:
                                 if st.button(f"Delete {i}", key=f"delete_{i}"):
@@ -478,7 +478,7 @@ def show_search_retrieve(memory):
                 for i, result in enumerate(results, 1):
                     with st.expander(f"Quick Result {i} (Similarity: {result['similarity']:.3f})"):
                         st.write(result['content'])
-                        st.json(result['metadata'])
+                        st.json(result.get('metadata', {}))
         except Exception as e:
             st.error(f"❌ Error in quick search: {e}")
 

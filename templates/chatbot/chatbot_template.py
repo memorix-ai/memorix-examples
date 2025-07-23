@@ -104,13 +104,13 @@ class ChatbotTemplate:
         # Filter for user-specific context
         recent_context = [
             result for result in all_context 
-            if result['metadata'].get('user_id') == user_id
+            if result.get('metadata', {}).get('user_id') == user_id
         ][:top_k]
         
         # Filter for general knowledge
         general_context = [
             result for result in all_context 
-            if result['metadata'].get('type') == 'knowledge'
+            if result.get('metadata', {}).get('type') == 'knowledge'
         ][:3]
         
         return recent_context + general_context
@@ -169,7 +169,7 @@ class ChatbotTemplate:
             # Filter for user-specific memories
             user_memories = [
                 memory for memory in all_memories 
-                if memory['metadata'].get('user_id') == user_id
+                if memory.get('metadata', {}).get('user_id') == user_id
             ][:10]
             
             # Analyze user preferences

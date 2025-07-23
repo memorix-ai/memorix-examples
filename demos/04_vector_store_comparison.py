@@ -188,7 +188,7 @@ class VectorStoreBenchmark:
                 # Filter results in Python
                 results = [
                     result for result in all_results 
-                    if result['metadata'].get('category') == category
+                    if result.get('metadata', {}).get('category') == category
                 ][:5]
                 filter_time = time.time() - start_time
                 filter_times.append(filter_time)
@@ -476,7 +476,7 @@ def demo_qdrant_features():
         # Filter results in Python
         results = [
             result for result in all_results 
-            if result['metadata'].get('category') == "programming"
+            if result.get('metadata', {}).get('category') == "programming"
         ][:5]
         print(f"Found {len(results)} programming-related results")
         

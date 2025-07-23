@@ -114,7 +114,7 @@ class KnowledgeBase:
             for result in results:
                 matches = True
                 for key, value in metadata_filter.items():
-                    if result['metadata'].get(key) != value:
+                    if result.get('metadata', {}).get(key) != value:
                         matches = False
                         break
                 if matches:
@@ -130,7 +130,7 @@ class KnowledgeBase:
         # Filter for specific document
         doc_results = [
             result for result in results 
-            if result['metadata'].get('doc_id') == doc_id
+            if result.get('metadata', {}).get('doc_id') == doc_id
         ]
         
         return doc_results[:top_k]
@@ -142,7 +142,7 @@ class KnowledgeBase:
         
         doc_chunks = [
             memory for memory in all_memories 
-            if memory['metadata'].get('doc_id') == doc_id
+            if memory.get('metadata', {}).get('doc_id') == doc_id
         ]
         
         return doc_chunks
@@ -437,8 +437,8 @@ def demo_semantic_search(kb: KnowledgeBase):
         if results:
             print(f"Found {len(results)} relevant results:")
             for i, result in enumerate(results, 1):
-                print(f"  {i}. Document: {result['metadata'].get('doc_id', 'Unknown')}")
-                print(f"     Chunk: {result['metadata'].get('chunk_index', 'N/A')}")
+                            print(f"  {i}. Document: {result.get('metadata', {}).get('doc_id', 'Unknown')}")
+            print(f"     Chunk: {result.get('metadata', {}).get('chunk_index', 'N/A')}")
                 print(f"     Content: {result['content'][:100]}...")
                 print(f"     Similarity: {result['similarity']:.3f}")
                 print()
@@ -470,7 +470,7 @@ def demo_metadata_filtering(kb: KnowledgeBase):
         if results:
             print(f"Found {len(results)} results:")
             for i, result in enumerate(results, 1):
-                print(f"  {i}. {result['metadata'].get('doc_id', 'Unknown')}")
+                print(f"  {i}. {result.get('metadata', {}).get('doc_id', 'Unknown')}")
                 print(f"     {result['content'][:60]}...")
         else:
             print("  No results found with this filter.")
@@ -496,7 +496,7 @@ def demo_document_specific_search(kb: KnowledgeBase):
         if results:
             print(f"Found {len(results)} results in {doc_id}:")
             for i, result in enumerate(results, 1):
-                print(f"  {i}. Chunk {result['metadata'].get('chunk_index', 'N/A')}")
+                print(f"  {i}. Chunk {result.get('metadata', {}).get('chunk_index', 'N/A')}")
                 print(f"     {result['content'][:80]}...")
                 print(f"     Similarity: {result['similarity']:.3f}")
         else:
@@ -553,7 +553,7 @@ def demo_question_answering(kb: KnowledgeBase):
             print("A: Based on the knowledge base:")
             for i, result in enumerate(results, 1):
                 print(f"  {i}. {result['content'][:120]}...")
-                print(f"     Source: {result['metadata'].get('doc_id', 'Unknown')}")
+                print(f"     Source: {result.get('metadata', {}).get('doc_id', 'Unknown')}")
         else:
             print("A: No relevant information found in the knowledge base.")
 
@@ -619,8 +619,8 @@ def demo_interactive_search(kb: KnowledgeBase):
             if results:
                 print(f"\nFound {len(results)} results:")
                 for i, result in enumerate(results, 1):
-                    print(f"\n{i}. Document: {result['metadata'].get('doc_id', 'Unknown')}")
-                    print(f"   Chunk: {result['metadata'].get('chunk_index', 'N/A')}")
+                                print(f"\n{i}. Document: {result.get('metadata', {}).get('doc_id', 'Unknown')}")
+            print(f"   Chunk: {result.get('metadata', {}).get('chunk_index', 'N/A')}")
                     print(f"   Similarity: {result['similarity']:.3f}")
                     print(f"   Content: {result['content']}")
             else:

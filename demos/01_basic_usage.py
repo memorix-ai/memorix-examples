@@ -133,7 +133,7 @@ def demo_retrieval(memory):
             for i, result in enumerate(results, 1):
                 print(f"  {i}. {result['content'][:80]}...")
                 print(f"     Similarity: {result['similarity']:.3f}")
-                print(f"     Metadata: {result['metadata']}")
+                print(f"     Metadata: {result.get('metadata', {})}")
         else:
             print("  No relevant memories found.")
 
@@ -153,14 +153,14 @@ def demo_metadata_filtering(memory):
     # Filter results in Python for intermediate difficulty
     filtered_results = [
         result for result in results 
-        if result['metadata'].get('difficulty') == 'intermediate'
+        if result.get('metadata', {}).get('difficulty') == 'intermediate'
     ]
     
     if filtered_results:
         print(f"Found {len(filtered_results)} results with intermediate difficulty:")
         for i, result in enumerate(filtered_results[:5], 1):
             print(f"  {i}. {result['content'][:60]}...")
-            print(f"     Difficulty: {result['metadata'].get('difficulty', 'N/A')}")
+            print(f"     Difficulty: {result.get('metadata', {}).get('difficulty', 'N/A')}")
     else:
         print("No results found with intermediate difficulty.")
         if results:
@@ -189,7 +189,7 @@ def demo_update_and_delete(memory, memory_ids):
         results = memory.retrieve("python programming", top_k=1)
         if results:
             print(f"Updated content: {results[0]['content']}")
-            print(f"Updated metadata: {results[0]['metadata']}")
+            print(f"Updated metadata: {results[0].get('metadata', {})}")
     
     # Delete a memory
     memory_id_to_delete = memory_ids[-1]
@@ -216,7 +216,7 @@ def demo_list_memories(memory):
         for i, mem in enumerate(memories, 1):
             print(f"  {i}. ID: {mem['memory_id'][:8]}...")
             print(f"     Content: {mem['content'][:60]}...")
-            print(f"     Metadata: {mem['metadata']}")
+            print(f"     Metadata: {mem.get('metadata', {})}")
             print()
     else:
         print("No memories found.")
