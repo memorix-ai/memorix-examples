@@ -234,11 +234,17 @@ def demo_similarity_threshold(memory):
     
     for threshold in thresholds:
         print(f"\nSearching with similarity threshold: {threshold}")
-        results = memory.retrieve(query, top_k=5, similarity_threshold=threshold)
+        results = memory.retrieve(query, top_k=5)
         
-        if results:
-            print(f"Found {len(results)} results:")
-            for i, result in enumerate(results, 1):
+        # Filter results by similarity threshold in Python
+        filtered_results = [
+            result for result in results 
+            if result.get('similarity', 0) >= threshold
+        ]
+        
+        if filtered_results:
+            print(f"Found {len(filtered_results)} results above threshold:")
+            for i, result in enumerate(filtered_results, 1):
                 print(f"  {i}. Similarity: {result['similarity']:.3f}")
                 print(f"     {result['content'][:50]}...")
         else:

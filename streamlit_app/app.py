@@ -383,9 +383,15 @@ def show_search_retrieve(memory):
                 with st.spinner("Searching..."):
                     all_results = memory.retrieve(
                         query,
-                        top_k=top_k * 2,
-                        similarity_threshold=similarity_threshold
+                        top_k=top_k * 2
                     )
+                    
+                    # Apply similarity threshold filtering in Python
+                    if similarity_threshold > 0:
+                        all_results = [
+                            result for result in all_results 
+                            if result.get('similarity', 0) >= similarity_threshold
+                        ]
                     
                     # Apply metadata filtering in Python
                     if metadata_filter:
