@@ -1,0 +1,80 @@
+name: Test Demos
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-demos:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        # Note: Python 3.12 excluded due to faiss-cpu compatibility issues
+        python-version: ["3.9", "3.10", "3.11"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+    
+    - name: Set up environment variables
+      run: |
+        echo "OPENAI_API_KEY=dummy-key-for-testing" >> $GITHUB_ENV
+        echo "GOOGLE_API_KEY=dummy-key-for-testing" >> $GITHUB_ENV
+    
+    - name: Test basic usage demo
+      run: |
+        cd demos
+        python 01_basic_usage.py --test-mode
+      env:
+        OPENAI_API_KEY: dummy-key-for-testing
+    
+    - name: Test chatbot memory demo
+      run: |
+        cd demos
+        python 02_chatbot_memory.py --test-mode
+      env:
+        OPENAI_API_KEY: dummy-key-for-testing
+    
+    - name: Test vector store comparison demo
+      run: |
+        cd demos
+        python 04_vector_store_comparison.py --test-mode
+      env:
+        OPENAI_API_KEY: dummy-key-for-testing
+    
+    - name: Clean up test files
+      if: always()
+      run: |
+        rm -rf ./demo_* ./chatbot_* ./benchmark_* ./streamlit_*
+        rm -rf ./*_index ./*_metadata.db ./*_metadata.json
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          test-results/
+          *.log
+        retention-days: 7 

@@ -1,0 +1,42 @@
+# Memorix SDK Configuration Example
+# Copy this file and modify as needed for your use case
+
+vector_store:
+  # Vector store type: 'faiss', 'qdrant', etc.
+  type: faiss
+  
+  # Path to store the vector index
+  index_path: ./memorix_index
+  
+  # Embedding dimension (should match your embedder)
+  dimension: 1536
+
+embedder:
+  # Embedder type: 'openai', 'gemini', 'sentence_transformers'
+  type: openai
+  
+  # Model name for the embedder
+  model: text-embedding-ada-002
+  
+  # API key (set via environment variable for security)
+  api_key: ${OPENAI_API_KEY}
+
+metadata_store:
+  # Metadata store type: 'sqlite', 'memory', 'json'
+  type: sqlite
+  
+  # Database path for SQLite
+  database_path: ./memorix_metadata.db
+  
+  # File path for JSON storage (if using json type)
+  file_path: ./memorix_metadata.json
+
+settings:
+  # Maximum number of memories to store
+  max_memories: 10000
+  
+  # Similarity threshold for retrieval
+  similarity_threshold: 0.7
+  
+  # Default number of results to return
+  default_top_k: 5 
