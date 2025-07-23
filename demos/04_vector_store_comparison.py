@@ -181,11 +181,15 @@ class VectorStoreBenchmark:
             
             for category in ["programming", "ai", "tools"]:
                 start_time = time.time()
-                results = memory.retrieve(
+                all_results = memory.retrieve(
                     "technology",
-                    top_k=5,
-                    metadata_filter={"category": category}
+                    top_k=15
                 )
+                # Filter results in Python
+                results = [
+                    result for result in all_results 
+                    if result['metadata'].get('category') == category
+                ][:5]
                 filter_time = time.time() - start_time
                 filter_times.append(filter_time)
             
@@ -465,11 +469,15 @@ def demo_qdrant_features():
         print("✅ Qdrant demo completed!")
         
         # Test advanced filtering
-        results = memory.retrieve(
+        all_results = memory.retrieve(
             "technology",
-            top_k=5,
-            metadata_filter={"category": "programming"}
+            top_k=15
         )
+        # Filter results in Python
+        results = [
+            result for result in all_results 
+            if result['metadata'].get('category') == "programming"
+        ][:5]
         print(f"Found {len(results)} programming-related results")
         
     except Exception as e:

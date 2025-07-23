@@ -106,23 +106,46 @@ class KnowledgeBase:
     def search(self, query: str, top_k: int = 5, 
                metadata_filter: Dict = None) -> List[Dict]:
         """Search the knowledge base."""
-        return self.memory.retrieve(query, top_k=top_k, metadata_filter=metadata_filter)
+        results = self.memory.retrieve(query, top_k=top_k * 2)  # Get more results for filtering
+        
+        if metadata_filter:
+            # Filter results in Python
+            filtered_results = []
+            for result in results:
+                matches = True
+                for key, value in metadata_filter.items():
+                    if result['metadata'].get(key) != value:
+                        matches = False
+                        break
+                if matches:
+                    filtered_results.append(result)
+            return filtered_results[:top_k]
+        
+        return results[:top_k]
     
     def search_by_document(self, query: str, doc_id: str, top_k: int = 5) -> List[Dict]:
         """Search within a specific document."""
-        return self.memory.retrieve(
-            query, 
-            top_k=top_k, 
-            metadata_filter={"doc_id": doc_id}
-        )
+        results = self.memory.retrieve(query, top_k=top_k * 2)
+        
+        # Filter for specific document
+        doc_results = [
+            result for result in results 
+            if result['metadata'].get('doc_id') == doc_id
+        ]
+        
+        return doc_results[:top_k]
     
     def get_document_chunks(self, doc_id: str) -> List[Dict]:
         """Get all chunks for a specific document."""
-        return self.memory.retrieve(
-            "",  # Empty query to get all
-            top_k=1000,  # Large number to get all chunks
-            metadata_filter={"doc_id": doc_id}
-        )
+        # Get all memories and filter by document ID
+        all_memories = self.memory.list_memories(limit=1000)
+        
+        doc_chunks = [
+            memory for memory in all_memories 
+            if memory['metadata'].get('doc_id') == doc_id
+        ]
+        
+        return doc_chunks
     
     def delete_document(self, doc_id: str) -> bool:
         """Delete a document and all its chunks."""

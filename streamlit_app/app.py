@@ -381,12 +381,34 @@ def show_search_retrieve(memory):
         if query:
             try:
                 with st.spinner("Searching..."):
-                    results = memory.retrieve(
+                    all_results = memory.retrieve(
                         query,
-                        top_k=top_k,
-                        similarity_threshold=similarity_threshold,
-                        metadata_filter=metadata_filter if metadata_filter else None
+                        top_k=top_k * 2,
+                        similarity_threshold=similarity_threshold
                     )
+                    
+                    # Apply metadata filtering in Python
+                    if metadata_filter:
+                        filtered_results = []
+                        for result in all_results:
+                            matches = True
+                            for key, value in metadata_filter.items():
+                                if key == "tags":
+                                    # Handle tags as a list
+                                    result_tags = result['metadata'].get('tags', [])
+                                    if isinstance(result_tags, str):
+                                        result_tags = [tag.strip() for tag in result_tags.split(",")]
+                                    if not any(tag in result_tags for tag in value):
+                                        matches = False
+                                        break
+                                elif result['metadata'].get(key) != value:
+                                    matches = False
+                                    break
+                            if matches:
+                                filtered_results.append(result)
+                        results = filtered_results[:top_k]
+                    else:
+                        results = all_results[:top_k]
                 
                 if results:
                     st.success(f"✅ Found {len(results)} results")

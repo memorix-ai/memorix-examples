@@ -143,21 +143,28 @@ def demo_metadata_filtering(memory):
     print("\n🏷️  Demo 3: Metadata Filtering")
     print("=" * 50)
     
-    # Search for AI-related content with difficulty filter
-    print("Searching for AI content with intermediate difficulty...")
+    # Search for AI-related content
+    print("Searching for AI content...")
     results = memory.retrieve(
         "artificial intelligence",
-        top_k=5,
-        metadata_filter={"difficulty": "intermediate"}
+        top_k=10
     )
     
-    if results:
-        print(f"Found {len(results)} results:")
-        for i, result in enumerate(results, 1):
+    # Filter results in Python for intermediate difficulty
+    filtered_results = [
+        result for result in results 
+        if result['metadata'].get('difficulty') == 'intermediate'
+    ]
+    
+    if filtered_results:
+        print(f"Found {len(filtered_results)} results with intermediate difficulty:")
+        for i, result in enumerate(filtered_results[:5], 1):
             print(f"  {i}. {result['content'][:60]}...")
             print(f"     Difficulty: {result['metadata'].get('difficulty', 'N/A')}")
     else:
-        print("No results found with the specified criteria.")
+        print("No results found with intermediate difficulty.")
+        if results:
+            print(f"Found {len(results)} total results, but none with intermediate difficulty.")
 
 
 def demo_update_and_delete(memory, memory_ids):

@@ -80,18 +80,22 @@ class ChatbotWithMemory:
     def get_user_context(self, user_id: str, query: str, top_k: int = 5) -> List[Dict]:
         """Retrieve relevant context for a user."""
         # Get recent conversations
-        recent_context = self.memory.retrieve(
+        all_context = self.memory.retrieve(
             query,
-            top_k=top_k,
-            metadata_filter={"user_id": user_id}
+            top_k=top_k + 3
         )
         
-        # Get general knowledge that might be relevant
-        general_context = self.memory.retrieve(
-            query,
-            top_k=3,
-            metadata_filter={"type": "knowledge"}
-        )
+        # Filter for user-specific context
+        recent_context = [
+            result for result in all_context 
+            if result['metadata'].get('user_id') == user_id
+        ][:top_k]
+        
+        # Filter for general knowledge
+        general_context = [
+            result for result in all_context 
+            if result['metadata'].get('type') == 'knowledge'
+        ][:3]
         
         return recent_context + general_context
     
@@ -142,11 +146,16 @@ class ChatbotWithMemory:
         """Get or create a user profile based on conversation history."""
         if user_id not in self.user_profiles:
             # Retrieve user's conversation history
-            user_memories = self.memory.retrieve(
+            all_memories = self.memory.retrieve(
                 "user preferences interests topics",
-                top_k=10,
-                metadata_filter={"user_id": user_id}
+                top_k=20
             )
+            
+            # Filter for user-specific memories
+            user_memories = [
+                memory for memory in all_memories 
+                if memory['metadata'].get('user_id') == user_id
+            ][:10]
             
             # Analyze user preferences
             topics = {}
