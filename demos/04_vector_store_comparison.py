@@ -4,15 +4,18 @@ Memorix SDK - Vector Store Comparison Demo
 ==========================================
 
 This demo compares different vector stores supported by Memorix SDK:
-- FAISS: Fast similarity search for local storage
+- FAISS: Fast similarity search
 - Qdrant: Vector database with advanced features
+- Performance benchmarking
+- Feature comparison
 
-Learn which vector store is best for your use case!
+Perfect for choosing the right vector store for your use case!
 """
 
 import os
 import sys
 import time
+import argparse
 import json
 from pathlib import Path
 from typing import List, Dict, Any
@@ -79,9 +82,28 @@ class VectorStoreBenchmark:
     
     def create_config(self, vector_store_type: str) -> Config:
         """Create configuration for a specific vector store."""
-        config = Config()
+        # Load base configuration from YAML file
+        config_path = Path(__file__).parent.parent / "configs" / "example_config.yaml"
         
-        # Set up vector store
+        if config_path.exists():
+            config = Config(str(config_path))
+        else:
+            config = Config()
+            
+            # Set up embedder
+            config.set('embedder.type', 'openai')
+            config.set('embedder.model', 'text-embedding-ada-002')
+            
+            # Set up metadata store
+            config.set('metadata_store.type', 'sqlite')
+            config.set('metadata_store.database_path', './benchmark_metadata.db')
+            
+            # Set up settings
+            config.set('settings.max_memories', 10000)
+            config.set('settings.similarity_threshold', 0.6)
+            config.set('settings.default_top_k', 5)
+        
+        # Override vector store settings for benchmarking
         config.set('vector_store.type', vector_store_type)
         
         if vector_store_type == 'faiss':
@@ -92,10 +114,7 @@ class VectorStoreBenchmark:
         
         config.set('vector_store.dimension', 1536)
         
-        # Set up embedder
-        config.set('embedder.type', 'openai')
-        config.set('embedder.model', 'text-embedding-ada-002')
-        
+        # Set API key if available
         api_key = os.getenv('OPENAI_API_KEY')
         if not api_key:
             print("⚠️  Using sentence transformers for demo...")
@@ -103,15 +122,6 @@ class VectorStoreBenchmark:
             config.set('embedder.model', 'all-MiniLM-L6-v2')
         else:
             config.set('embedder.api_key', api_key)
-        
-        # Set up metadata store
-        config.set('metadata_store.type', 'sqlite')
-        config.set('metadata_store.database_path', f'./benchmark_{vector_store_type}_metadata.db')
-        
-        # Set up settings
-        config.set('settings.max_memories', 10000)
-        config.set('settings.similarity_threshold', 0.6)
-        config.set('settings.default_top_k', 5)
         
         return config
     
@@ -493,47 +503,54 @@ def cleanup():
 
 def main():
     """Main demo function."""
+    parser = argparse.ArgumentParser(description='Memorix SDK Vector Store Comparison Demo')
+    parser.add_argument('--test-mode', action='store_true', 
+                       help='Run in test mode (no user interaction)')
+    args = parser.parse_args()
+    
     print("🔍 Memorix SDK - Vector Store Comparison Demo")
     print("=" * 50)
-    print("This demo compares FAISS and Qdrant vector stores")
+    print("This demo compares different vector stores")
     print("to help you choose the right one for your use case!")
     
     try:
-        # Run benchmarks
+        # Run benchmark comparison
         benchmark = VectorStoreBenchmark()
         results = benchmark.run_comparison()
-        
-        # Print comparison
         benchmark.print_comparison()
-        
-        # Generate recommendations
         benchmark.generate_recommendations()
         
-        # Feature demos
+        # Run feature demos
         demo_faiss_features()
         demo_qdrant_features()
         
-        print("\n🎉 Vector store comparison completed!")
+        print("\n🎉 Vector store comparison demo completed successfully!")
         print("\nWhat you learned:")
-        print("✅ Performance differences between FAISS and Qdrant")
-        print("✅ When to use each vector store")
-        print("✅ Setup requirements for each option")
-        print("✅ Feature capabilities of each store")
+        print("✅ How to compare different vector stores")
+        print("✅ Performance characteristics of each store")
+        print("✅ When to use FAISS vs Qdrant")
+        print("✅ How to benchmark your own use cases")
         
-        print("\n🚀 Ready to choose the right vector store for your project!")
+        print("\n🚀 Ready to choose the best vector store for your application!")
         
     except Exception as e:
         print(f"\n❌ Error during demo: {e}")
+        print("Please check your configuration and API keys.")
         return 1
     
     finally:
-        # Ask user if they want to clean up
-        response = input("\n🧹 Clean up demo files? (y/n): ").lower().strip()
-        if response in ['y', 'yes']:
-            cleanup()
-            print("✅ Cleanup completed!")
+        # Ask user if they want to clean up (skip in test mode)
+        if not args.test_mode:
+            response = input("\n🧹 Clean up demo files? (y/n): ").lower().strip()
+            if response in ['y', 'yes']:
+                cleanup()
+                print("✅ Cleanup completed!")
+            else:
+                print("💡 Demo files preserved for inspection.")
         else:
-            print("💡 Demo files preserved for inspection.")
+            # Auto-cleanup in test mode
+            cleanup()
+            print("✅ Test mode cleanup completed!")
     
     return 0
 

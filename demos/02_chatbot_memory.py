@@ -16,6 +16,7 @@ import os
 import sys
 import json
 import time
+import argparse
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -172,16 +173,33 @@ def setup_config():
     """Set up configuration for the chatbot demo."""
     print("🔧 Setting up chatbot configuration...")
     
-    config = Config()
+    # Load configuration from YAML file
+    config_path = Path(__file__).parent.parent / "configs" / "example_config.yaml"
     
-    # Set up vector store
-    config.set('vector_store.type', 'faiss')
-    config.set('vector_store.index_path', './chatbot_index')
-    config.set('vector_store.dimension', 1536)
-    
-    # Set up embedder
-    config.set('embedder.type', 'openai')
-    config.set('embedder.model', 'text-embedding-ada-002')
+    if config_path.exists():
+        print(f"Loading configuration from: {config_path}")
+        config = Config(str(config_path))
+    else:
+        print("⚠️  Configuration file not found, using default config")
+        config = Config()
+        
+        # Set up vector store
+        config.set('vector_store.type', 'faiss')
+        config.set('vector_store.index_path', './chatbot_index')
+        config.set('vector_store.dimension', 1536)
+        
+        # Set up embedder
+        config.set('embedder.type', 'openai')
+        config.set('embedder.model', 'text-embedding-ada-002')
+        
+        # Set up metadata store
+        config.set('metadata_store.type', 'sqlite')
+        config.set('metadata_store.database_path', './chatbot_metadata.db')
+        
+        # Set up settings
+        config.set('settings.max_memories', 10000)
+        config.set('settings.similarity_threshold', 0.6)
+        config.set('settings.default_top_k', 5)
     
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
@@ -190,15 +208,6 @@ def setup_config():
         config.set('embedder.model', 'all-MiniLM-L6-v2')
     else:
         config.set('embedder.api_key', api_key)
-    
-    # Set up metadata store
-    config.set('metadata_store.type', 'sqlite')
-    config.set('metadata_store.database_path', './chatbot_metadata.db')
-    
-    # Set up settings
-    config.set('settings.max_memories', 10000)
-    config.set('settings.similarity_threshold', 0.6)
-    config.set('settings.default_top_k', 5)
     
     return config
 
@@ -389,6 +398,11 @@ def cleanup():
 
 def main():
     """Main demo function."""
+    parser = argparse.ArgumentParser(description='Memorix SDK Chatbot Memory Demo')
+    parser.add_argument('--test-mode', action='store_true', 
+                       help='Run in test mode (no user interaction)')
+    args = parser.parse_args()
+    
     print("🤖 Memorix SDK - Chatbot with Memory Demo")
     print("=" * 50)
     print("This demo shows how to build a conversational AI")
@@ -409,11 +423,12 @@ def main():
         demo_memory_retrieval(chatbot)
         demo_user_profiles(chatbot)
         
-        # Interactive demo
-        print("\n" + "="*50)
-        print("🎮 INTERACTIVE DEMO")
-        print("="*50)
-        demo_interactive_chat(chatbot)
+        # Interactive demo (skip in test mode)
+        if not args.test_mode:
+            print("\n" + "="*50)
+            print("🎮 INTERACTIVE DEMO")
+            print("="*50)
+            demo_interactive_chat(chatbot)
         
         print("\n🎉 Chatbot demo completed successfully!")
         print("\nWhat you learned:")
@@ -431,13 +446,18 @@ def main():
         return 1
     
     finally:
-        # Ask user if they want to clean up
-        response = input("\n🧹 Clean up demo files? (y/n): ").lower().strip()
-        if response in ['y', 'yes']:
-            cleanup()
-            print("✅ Cleanup completed!")
+        # Ask user if they want to clean up (skip in test mode)
+        if not args.test_mode:
+            response = input("\n🧹 Clean up demo files? (y/n): ").lower().strip()
+            if response in ['y', 'yes']:
+                cleanup()
+                print("✅ Cleanup completed!")
+            else:
+                print("💡 Demo files preserved for inspection.")
         else:
-            print("💡 Demo files preserved for inspection.")
+            # Auto-cleanup in test mode
+            cleanup()
+            print("✅ Test mode cleanup completed!")
     
     return 0
 

@@ -14,6 +14,7 @@ Run this demo to get started with Memorix in under 5 minutes!
 
 import os
 import sys
+import argparse
 from pathlib import Path
 
 # Add the parent directory to the path to import memorix
@@ -26,17 +27,33 @@ def setup_config():
     """Set up configuration for the demo."""
     print("🔧 Setting up configuration...")
     
-    # Create a basic configuration
-    config = Config()
+    # Load configuration from YAML file
+    config_path = Path(__file__).parent.parent / "configs" / "example_config.yaml"
     
-    # Set up vector store (FAISS for this demo)
-    config.set('vector_store.type', 'faiss')
-    config.set('vector_store.index_path', './demo_index')
-    config.set('vector_store.dimension', 1536)
-    
-    # Set up embedder (OpenAI)
-    config.set('embedder.type', 'openai')
-    config.set('embedder.model', 'text-embedding-ada-002')
+    if config_path.exists():
+        print(f"Loading configuration from: {config_path}")
+        config = Config(str(config_path))
+    else:
+        print("⚠️  Configuration file not found, using default config")
+        config = Config()
+        
+        # Set up vector store (FAISS for this demo)
+        config.set('vector_store.type', 'faiss')
+        config.set('vector_store.index_path', './demo_index')
+        config.set('vector_store.dimension', 1536)
+        
+        # Set up embedder (OpenAI)
+        config.set('embedder.type', 'openai')
+        config.set('embedder.model', 'text-embedding-ada-002')
+        
+        # Set up metadata store
+        config.set('metadata_store.type', 'sqlite')
+        config.set('metadata_store.database_path', './demo_metadata.db')
+        
+        # Set up settings
+        config.set('settings.max_memories', 1000)
+        config.set('settings.similarity_threshold', 0.7)
+        config.set('settings.default_top_k', 5)
     
     # Get API key from environment
     api_key = os.getenv('OPENAI_API_KEY')
@@ -44,21 +61,12 @@ def setup_config():
         print("⚠️  Warning: OPENAI_API_KEY not found in environment")
         print("   Please set your OpenAI API key:")
         print("   export OPENAI_API_KEY='your-api-key-here'")
-        print("   Using a mock embedder for demo purposes...")
-        # For demo purposes, we'll use a mock configuration
+        print("   Using sentence transformers for demo purposes...")
+        # For demo purposes, we'll use sentence transformers
         config.set('embedder.type', 'sentence_transformers')
         config.set('embedder.model', 'all-MiniLM-L6-v2')
     else:
         config.set('embedder.api_key', api_key)
-    
-    # Set up metadata store
-    config.set('metadata_store.type', 'sqlite')
-    config.set('metadata_store.database_path', './demo_metadata.db')
-    
-    # Set up settings
-    config.set('settings.max_memories', 1000)
-    config.set('settings.similarity_threshold', 0.7)
-    config.set('settings.default_top_k', 5)
     
     return config
 
@@ -252,6 +260,11 @@ def cleanup():
 
 def main():
     """Main demo function."""
+    parser = argparse.ArgumentParser(description='Memorix SDK Basic Usage Demo')
+    parser.add_argument('--test-mode', action='store_true', 
+                       help='Run in test mode (no user interaction)')
+    args = parser.parse_args()
+    
     print("🧠 Memorix SDK - Basic Usage Demo")
     print("=" * 50)
     print("This demo will show you the core features of Memorix SDK")
@@ -290,13 +303,18 @@ def main():
         return 1
     
     finally:
-        # Ask user if they want to clean up
-        response = input("\n🧹 Clean up demo files? (y/n): ").lower().strip()
-        if response in ['y', 'yes']:
-            cleanup()
-            print("✅ Cleanup completed!")
+        # Ask user if they want to clean up (skip in test mode)
+        if not args.test_mode:
+            response = input("\n🧹 Clean up demo files? (y/n): ").lower().strip()
+            if response in ['y', 'yes']:
+                cleanup()
+                print("✅ Cleanup completed!")
+            else:
+                print("💡 Demo files preserved for inspection.")
         else:
-            print("💡 Demo files preserved for inspection.")
+            # Auto-cleanup in test mode
+            cleanup()
+            print("✅ Test mode cleanup completed!")
     
     return 0
 

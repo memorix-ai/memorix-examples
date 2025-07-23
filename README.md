@@ -6,7 +6,7 @@ Welcome to the Memorix SDK Examples repository! This collection of demos showcas
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/memorix-examples.git
+git clone https://github.com/memorix-ai/memorix-examples.git
 cd memorix-examples
 
 # Install dependencies
@@ -22,34 +22,22 @@ python demos/01_basic_usage.py
 
 ## 📚 Demo Collection
 
-### 🎯 Core Demos
+### 🎯 Core Demos (MVP)
 - **[01_basic_usage.py](demos/01_basic_usage.py)** - Get started with Memorix in 5 minutes
 - **[02_chatbot_memory.py](demos/02_chatbot_memory.py)** - Build a conversational AI with memory
-- **[03_knowledge_base.py](demos/03_knowledge_base.py)** - Create a searchable knowledge base
 - **[04_vector_store_comparison.py](demos/04_vector_store_comparison.py)** - Compare different vector stores
 
-### 🔧 Advanced Demos
+### 🔧 Advanced Demos (Coming Soon)
 - **[05_embedding_models.py](demos/05_embedding_models.py)** - Explore different embedding models
-- **[06_metadata_management.py](demos/06_metadata_management.py)** - Advanced metadata operations
-- **[07_batch_operations.py](demos/07_batch_operations.py)** - Efficient bulk memory operations
-- **[08_custom_components.py](demos/08_custom_components.py)** - Build custom vector stores and embedders
-
-### 🎨 Real-World Applications
-- **[09_document_qa.py](demos/09_document_qa.py)** - Question answering over documents
-- **[10_code_assistant.py](demos/10_code_assistant.py)** - AI coding assistant with memory
-- **[11_research_assistant.py](demos/11_research_assistant.py)** - Research paper analysis and retrieval
-- **[12_customer_support.py](demos/12_customer_support.py)** - Customer support chatbot with context
-
-### 🧪 Experimental Demos
-- **[13_memory_compression.py](demos/13_memory_compression.py)** - Memory summarization techniques
-- **[14_multi_modal_memory.py](demos/14_multi_modal_memory.py)** - Text and image memory storage
-- **[15_temporal_memory.py](demos/15_temporal_memory.py)** - Time-aware memory retrieval
-- **[16_collaborative_memory.py](demos/16_collaborative_memory.py)** - Shared memory across users
+- Knowledge base creation and management
+- Document Q&A systems
+- Code assistance with memory
+- Research paper analysis
+- Customer support chatbots
 
 ## 🎬 Interactive Demos
 
 ### Web Applications
-- **[web_demo/](web_demo/)** - Interactive web interface for memory management
 - **[streamlit_app/](streamlit_app/)** - Streamlit-based memory explorer
 - **[gradio_app/](gradio_app/)** - Gradio interface for quick prototyping
 
@@ -63,9 +51,9 @@ python demos/01_basic_usage.py
 
 ### Starter Templates
 - **[templates/chatbot/](templates/chatbot/)** - Ready-to-use chatbot template
-- **[templates/knowledge_base/](templates/knowledge_base/)** - Knowledge base starter
-- **[templates/document_qa/](templates/document_qa/)** - Document Q&A system
-- **[templates/code_assistant/](templates/code_assistant/)** - Code assistant template
+- Knowledge base starter (coming soon)
+- Document Q&A system (coming soon)
+- Code assistant template (coming soon)
 
 ## 🎯 What You'll Learn
 
@@ -76,22 +64,6 @@ python demos/01_basic_usage.py
 - ✅ Configuration management
 - ✅ Different vector stores (FAISS, Qdrant)
 - ✅ Various embedding models (OpenAI, Gemini, Sentence Transformers)
-
-### Advanced Features
-- ✅ Batch operations
-- ✅ Custom components
-- ✅ Memory compression
-- ✅ Multi-modal storage
-- ✅ Temporal memory
-- ✅ Collaborative memory
-
-### Real-World Applications
-- ✅ Building chatbots with memory
-- ✅ Creating knowledge bases
-- ✅ Document question answering
-- ✅ Code assistance
-- ✅ Research paper analysis
-- ✅ Customer support systems
 
 ## 🚀 Getting Started
 
@@ -127,24 +99,6 @@ memory.store("User asked about Python programming", metadata={"session": "user_1
 
 # Retrieve relevant context for responses
 context = memory.retrieve("Python programming", top_k=3)
-```
-
-### 📚 Knowledge Base Creation
-Create searchable knowledge bases from documents:
-```python
-# Store document chunks with metadata
-for chunk in document_chunks:
-    memory.store(
-        chunk.text,
-        metadata={
-            "source": "document.pdf",
-            "page": chunk.page,
-            "section": chunk.section
-        }
-    )
-
-# Search across all documents
-results = memory.retrieve("machine learning algorithms", top_k=10)
 ```
 
 ### 🔍 Advanced Search
@@ -209,8 +163,8 @@ Join our growing community: Memorix
 ## 📞 Support & Community
 
 - 📖 **Documentation**: [docs.memorix.ai](https://docs.memorix.ai)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-org/memorix-sdk/discussions)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/your-org/memorix-sdk/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/memorix-ai/memorix-sdk/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/memorix-ai/memorix-sdk/issues)
 - 📧 **Email**: support@memorix.ai
 - 🐦 **Twitter**: [@MemorixAI](https://twitter.com/MemorixAI)
 
