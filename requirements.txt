@@ -1,5 +1,5 @@
-# Core Memorix SDK
-memorix-sdk==0.1.0
+# Core Memorix AI
+memorix-ai==0.1.0
 
 # Vector Stores
 faiss-cpu==1.7.4
